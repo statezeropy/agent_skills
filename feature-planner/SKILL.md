@@ -133,19 +133,19 @@ Add this to plan document header:
 - Single component or simple feature
 - Minimal dependencies
 - Clear requirements
-- Example: Add dark mode toggle, create new form component
+- Example: Add new prompt template, create utility module
 
 **Medium Scope** (4-5 phases, 8-15 hours total):
 - Multiple components or moderate feature
 - Some integration complexity
 - Database changes or API work
-- Example: User authentication system, search functionality
+- Example: LLM chain implementation, new API endpoint with processing
 
 **Large Scope** (6-7 phases, 15-25 hours total):
 - Complex feature spanning multiple areas
 - Significant architectural impact
 - Multiple integrations
-- Example: AI-powered search with embeddings, real-time collaboration
+- Example: RAG pipeline implementation, multi-model orchestration system
 
 ## Risk Assessment
 
@@ -226,81 +226,77 @@ Consider:
 
 **Coverage Thresholds** (adjust for your project):
 - **Business Logic**: ≥90% (critical code paths)
-- **Data Access Layer**: ≥80% (repositories, DAOs)
-- **API/Controller Layer**: ≥70% (endpoints)
-- **UI/Presentation**: Integration tests preferred over coverage
+- **Data Access Layer**: ≥80% (repositories)
+- **API/Router Layer**: ≥70% (FastAPI endpoints)
+- **ML/Model Layer**: Integration tests preferred over coverage
 
-**Coverage Commands by Ecosystem**:
+**Coverage Commands**:
 ```bash
-# JavaScript/TypeScript
-jest --coverage
-nyc report --reporter=html
+# Run tests with coverage
+uv run pytest --cov=src --cov-report=html --cov-report=term
 
-# Python
-pytest --cov=src --cov-report=html
-coverage report
+# View coverage report
+open htmlcov/index.html
 
-# Java
-mvn jacoco:report
-gradle jacocoTestReport
-
-# Go
-go test -cover ./...
-go tool cover -html=coverage.out
-
-# .NET
-dotnet test /p:CollectCoverage=true /p:CoverageReporter=html
-reportgenerator -reports:coverage.xml -targetdir:coverage
-
-# Ruby
-bundle exec rspec --coverage
-open coverage/index.html
-
-# PHP
-phpunit --coverage-html coverage
+# Check coverage threshold
+uv run pytest --cov=src --cov-fail-under=80
 ```
 
 ### Common Test Patterns
 
 **Arrange-Act-Assert (AAA) Pattern**:
-```
-test 'description of behavior':
-  // Arrange: Set up test data and dependencies
-  input = createTestData()
+```python
+def test_process_response():
+    # Arrange: Set up test data and dependencies
+    input_data = {"query": "test prompt"}
+    expected_output = {"result": "processed"}
 
-  // Act: Execute the behavior being tested
-  result = systemUnderTest.method(input)
+    # Act: Execute the behavior being tested
+    result = process_response(input_data)
 
-  // Assert: Verify expected outcome
-  assert result == expectedOutput
+    # Assert: Verify expected outcome
+    assert result == expected_output
 ```
 
 **Given-When-Then (BDD Style)**:
+```python
+def test_llm_chain_returns_valid_response():
+    # Given: Initial context/state
+    chain = create_summarization_chain()
+    input_text = "Long text to summarize..."
+
+    # When: Action occurs
+    result = chain.invoke({"text": input_text})
+
+    # Then: Observable outcome
+    assert "summary" in result
+    assert len(result["summary"]) < len(input_text)
 ```
-test 'feature should behave in specific way':
-  // Given: Initial context/state
-  given userIsLoggedIn()
 
-  // When: Action occurs
-  when userClicksButton()
+**Mocking External API/LLM Calls**:
+```python
+from unittest.mock import patch, MagicMock
 
-  // Then: Observable outcome
-  then shouldSeeConfirmation()
+def test_llm_chain_with_mock():
+    # Create mock response
+    mock_response = MagicMock()
+    mock_response.content = "Mocked LLM output"
+
+    # Patch the LLM client
+    with patch("module.llm_client.invoke", return_value=mock_response):
+        result = my_chain.run("test input")
+        assert "Mocked" in result
 ```
 
-**Mocking/Stubbing Dependencies**:
-```
-test 'component should call dependency':
-  // Create mock/stub
-  mockService = createMock(ExternalService)
-  component = new Component(mockService)
+**Async Test Pattern**:
+```python
+import pytest
 
-  // Configure mock behavior
-  when(mockService.method()).thenReturn(expectedData)
-
-  // Execute and verify
-  component.execute()
-  verify(mockService.method()).calledOnce()
+@pytest.mark.asyncio
+async def test_async_api_call():
+    result = await fetch_embeddings("test query")
+    assert result is not None
+    assert len(result) == 1536  # OpenAI embedding dimension
 ```
 
 ### Test Documentation in Plan

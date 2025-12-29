@@ -69,14 +69,15 @@
 
 ### Test File Organization
 ```
-test/
+tests/
 ├── unit/
-│   ├── [domain/business_logic]/
-│   └── [data/models]/
+│   ├── test_[domain].py
+│   └── test_[models].py
 ├── integration/
-│   └── [feature_name]/
-└── e2e/
-    └── [user_flows]/
+│   └── test_[feature_name].py
+├── conftest.py
+└── fixtures/
+    └── [test_data].json
 ```
 
 ### Coverage Requirements by Phase
@@ -86,12 +87,17 @@ test/
 - **Phase 4 (E2E)**: End-to-end user flow test (1+ critical path)
 
 ### Test Naming Convention
-Follow your project's testing framework conventions:
-```
-// Example structure (adapt to your framework):
-describe/group: Feature or component name
-  test/it: Specific behavior being tested
-    // Arrange → Act → Assert pattern
+Follow pytest conventions:
+```python
+# tests/unit/test_llm_chain.py
+
+class TestLLMChain:
+    def test_invoke_returns_valid_response(self):
+        # Arrange → Act → Assert pattern
+        ...
+
+    def test_handles_api_error_gracefully(self):
+        ...
 ```
 
 ---
@@ -107,7 +113,7 @@ describe/group: Feature or component name
 
 **🔴 RED: Write Failing Tests First**
 - [ ] **Test 1.1**: Write unit tests for [specific functionality]
-  - File(s): `test/unit/[feature]/[component]_test.*`
+  - File(s): `tests/unit/test_[component].py`
   - Expected: Tests FAIL (red) because feature doesn't exist yet
   - Details: Test cases covering:
     - Happy path scenarios
@@ -115,18 +121,18 @@ describe/group: Feature or component name
     - Error conditions
 
 - [ ] **Test 1.2**: Write integration tests for [component interaction]
-  - File(s): `test/integration/[feature]_test.*`
+  - File(s): `tests/integration/test_[feature].py`
   - Expected: Tests FAIL (red) because integration doesn't exist yet
   - Details: Test interaction between [list components]
 
 **🟢 GREEN: Implement to Make Tests Pass**
 - [ ] **Task 1.3**: Implement [component/module]
-  - File(s): `src/[layer]/[component].*`
+  - File(s): `src/[layer]/[component].py`
   - Goal: Make Test 1.1 pass with minimal code
   - Details: [Implementation notes]
 
 - [ ] **Task 1.4**: Implement [integration/glue code]
-  - File(s): `src/[layer]/[integration].*`
+  - File(s): `src/[layer]/[integration].py`
   - Goal: Make Test 1.2 pass
   - Details: [Implementation notes]
 
@@ -151,13 +157,7 @@ describe/group: Feature or component name
 - [ ] **Refactor Phase**: Code improved while tests still pass
 - [ ] **Coverage Check**: Test coverage meets requirements
   ```bash
-  # Example commands (adapt to your testing framework):
-  # npm test -- --coverage
-  # pytest --cov=src --cov-report=html
-  # dotnet test /p:CollectCoverage=true
-  # go test -cover ./...
-
-  [Your project's coverage command here]
+  uv run pytest --cov=src --cov-report=html --cov-report=term
   ```
 
 **Build & Tests**:
@@ -188,33 +188,20 @@ describe/group: Feature or component name
 - [ ] **Edge Cases**: Boundary conditions tested
 - [ ] **Error States**: Error handling verified
 
-**Validation Commands** (customize for your project):
+**Validation Commands**:
 ```bash
-# Test Commands
-[your test runner command]
-
-# Coverage Check
-[your coverage command]
+# Test & Coverage
+uv run pytest --cov=src --cov-report=term
 
 # Code Quality
-[your linter command]
-[your formatter check command]
-[your type checker command]
+uv run ruff check .
+uv run ruff format --check .
 
-# Build Verification
-[your build command]
+# Type Check
+uv run mypy src/
 
-# Security Audit
-[your dependency audit command]
-
-# Example for different ecosystems:
-# JavaScript/TypeScript: npm test && npm run lint && npm run type-check
-# Python: pytest && black --check . && mypy .
-# Java: mvn test && mvn checkstyle:check
-# Go: go test ./... && golangci-lint run
-# .NET: dotnet test && dotnet format --verify-no-changes
-# Ruby: bundle exec rspec && rubocop
-# Rust: cargo test && cargo clippy
+# Dependency Sync
+uv sync
 ```
 
 **Manual Test Checklist**:
@@ -233,7 +220,7 @@ describe/group: Feature or component name
 
 **🔴 RED: Write Failing Tests First**
 - [ ] **Test 2.1**: Write unit tests for [specific functionality]
-  - File(s): `test/unit/[feature]/[component]_test.*`
+  - File(s): `tests/unit/test_[component].py`
   - Expected: Tests FAIL (red) because feature doesn't exist yet
   - Details: Test cases covering:
     - Happy path scenarios
@@ -241,18 +228,18 @@ describe/group: Feature or component name
     - Error conditions
 
 - [ ] **Test 2.2**: Write integration tests for [component interaction]
-  - File(s): `test/integration/[feature]_test.*`
+  - File(s): `tests/integration/test_[feature].py`
   - Expected: Tests FAIL (red) because integration doesn't exist yet
   - Details: Test interaction between [list components]
 
 **🟢 GREEN: Implement to Make Tests Pass**
 - [ ] **Task 2.3**: Implement [component/module]
-  - File(s): `src/[layer]/[component].*`
+  - File(s): `src/[layer]/[component].py`
   - Goal: Make Test 2.1 pass with minimal code
   - Details: [Implementation notes]
 
 - [ ] **Task 2.4**: Implement [integration/glue code]
-  - File(s): `src/[layer]/[integration].*`
+  - File(s): `src/[layer]/[integration].py`
   - Goal: Make Test 2.2 pass
   - Details: [Implementation notes]
 
@@ -326,7 +313,7 @@ describe/group: Feature or component name
 
 **🔴 RED: Write Failing Tests First**
 - [ ] **Test 3.1**: Write unit tests for [specific functionality]
-  - File(s): `test/unit/[feature]/[component]_test.*`
+  - File(s): `tests/unit/test_[component].py`
   - Expected: Tests FAIL (red) because feature doesn't exist yet
   - Details: Test cases covering:
     - Happy path scenarios
@@ -334,18 +321,18 @@ describe/group: Feature or component name
     - Error conditions
 
 - [ ] **Test 3.2**: Write integration tests for [component interaction]
-  - File(s): `test/integration/[feature]_test.*`
+  - File(s): `tests/integration/test_[feature].py`
   - Expected: Tests FAIL (red) because integration doesn't exist yet
   - Details: Test interaction between [list components]
 
 **🟢 GREEN: Implement to Make Tests Pass**
 - [ ] **Task 3.3**: Implement [component/module]
-  - File(s): `src/[layer]/[component].*`
+  - File(s): `src/[layer]/[component].py`
   - Goal: Make Test 3.1 pass with minimal code
   - Details: [Implementation notes]
 
 - [ ] **Task 3.4**: Implement [integration/glue code]
-  - File(s): `src/[layer]/[integration].*`
+  - File(s): `src/[layer]/[integration].py`
   - Goal: Make Test 3.2 pass
   - Details: [Implementation notes]
 
@@ -414,9 +401,9 @@ describe/group: Feature or component name
 
 | Risk | Probability | Impact | Mitigation Strategy |
 |------|-------------|--------|---------------------|
-| [Risk 1: e.g., API changes break integration] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
-| [Risk 2: e.g., Performance degradation] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
-| [Risk 3: e.g., Database migration issues] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
+| [Risk 1: e.g., LLM API rate limits] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
+| [Risk 2: e.g., Model output variability] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
+| [Risk 3: e.g., External API changes] | Low/Med/High | Low/Med/High | [Specific mitigation steps] |
 
 ---
 
@@ -497,8 +484,8 @@ describe/group: Feature or component name
 - [ ] Full integration testing performed
 - [ ] Documentation updated
 - [ ] Performance benchmarks meet targets
-- [ ] Security review completed
-- [ ] Accessibility requirements met (if UI feature)
+- [ ] Security review completed (no hardcoded secrets)
+- [ ] API error handling verified
 - [ ] All stakeholders notified
 - [ ] Plan document archived for future reference
 
@@ -506,62 +493,88 @@ describe/group: Feature or component name
 
 ## 📖 TDD Example Workflow
 
-### Example: Adding User Authentication Feature
+### Example: Adding LLM Summarization Chain
 
 **Phase 1: RED (Write Failing Tests)**
 
-```
-# Pseudocode - adapt to your testing framework
+```python
+# tests/unit/test_summarizer.py
 
-test "should validate user credentials":
-  // Arrange
-  authService = new AuthService(mockDatabase)
-  validCredentials = {username: "user", password: "pass"}
+import pytest
+from unittest.mock import MagicMock, patch
 
-  // Act
-  result = authService.authenticate(validCredentials)
+def test_summarize_returns_valid_response():
+    # Arrange
+    summarizer = Summarizer(model="gpt-4")
+    input_text = "Long article text here..."
 
-  // Assert
-  expect(result.isSuccess).toBe(true)
-  expect(result.user).toBeDefined()
-  // TEST FAILS - AuthService doesn't exist yet
+    # Act
+    result = summarizer.summarize(input_text)
+
+    # Assert
+    assert result is not None
+    assert len(result) < len(input_text)
+    # TEST FAILS - Summarizer class doesn't exist yet
 ```
 
 **Phase 2: GREEN (Minimal Implementation)**
 
-```
-class AuthService:
-  function authenticate(credentials):
-    // Minimal code to make test pass
-    user = database.findUser(credentials.username)
-    if user AND user.password == credentials.password:
-      return Success(user)
-    return Failure("Invalid credentials")
-    // TEST PASSES - minimal functionality works
+```python
+# src/chains/summarizer.py
+
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+
+class Summarizer:
+    def __init__(self, model: str = "gpt-4"):
+        self.llm = ChatOpenAI(model=model)
+        self.prompt = PromptTemplate.from_template(
+            "Summarize the following text:\n\n{text}"
+        )
+
+    def summarize(self, text: str) -> str:
+        chain = self.prompt | self.llm
+        response = chain.invoke({"text": text})
+        return response.content
+        # TEST PASSES - minimal functionality works
 ```
 
 **Phase 3: REFACTOR (Improve Design)**
 
-```
-class AuthService:
-  function authenticate(credentials):
-    // Add validation
-    if not this.validateCredentials(credentials):
-      return Failure("Invalid input")
+```python
+# src/chains/summarizer.py
 
-    // Add error handling
-    try:
-      user = database.findUser(credentials.username)
+import logging
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from tenacity import retry, stop_after_attempt, wait_exponential
 
-      // Use secure password comparison
-      if user AND this.secureCompare(user.password, credentials.password):
-        return Success(user)
+logger = logging.getLogger(__name__)
 
-      return Failure("Invalid credentials")
-    catch DatabaseError as error:
-      logger.error(error)
-      return Failure("Authentication failed")
-    // TESTS STILL PASS - improved code quality
+class Summarizer:
+    def __init__(self, model: str = "gpt-4", max_length: int = 500):
+        self.llm = ChatOpenAI(model=model)
+        self.max_length = max_length
+        self.prompt = PromptTemplate.from_template(
+            "Summarize in {max_length} chars:\n\n{text}"
+        )
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential())
+    def summarize(self, text: str) -> str:
+        if not text or not text.strip():
+            raise ValueError("Input text cannot be empty")
+
+        try:
+            chain = self.prompt | self.llm
+            response = chain.invoke({
+                "text": text,
+                "max_length": self.max_length
+            })
+            return response.content
+        except Exception as e:
+            logger.exception("Summarization failed")
+            raise
+        # TESTS STILL PASS - improved code quality
 ```
 
 ### TDD Red-Green-Refactor Cycle Visualization
